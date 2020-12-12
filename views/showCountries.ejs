@@ -1,0 +1,49 @@
+<style>
+    table {
+        border: 2px solid rgb(154, 154, 154);
+        border-collapse: collapse; /* Stops different borders from overlapping*/
+    }
+    th {
+        border: solid 2px rgb(154, 154, 154);
+    }
+    td {
+        border: solid 2px rgb(154, 154, 154);
+    }
+</style>
+
+<body>
+    <!-- Header Text -->
+    <h1>Countries</h1>
+
+    <!-- Table -->
+    <table>
+        <!-- Column names at top -->
+        <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Details</th>
+            <th>Action</th>
+            <th></th>
+        </tr>
+        <!-- define and loop through country array -->
+        <!-- data is passed in when this view is rendered -->
+        <!-- create a row for each country -->
+        <% countries.forEach((country)=>
+            { %>
+            <tr>
+                <!-- ___ -->
+                <td>
+                    <%= country.co_code %>
+                </td>
+                <td>
+                    <%= country.co_name %>
+                </td>
+                <td>
+                    <%= country.co_details %>
+                </td>
+                <td>Update</td>
+                <td>Delete</td>
+            </tr>
+            <% }) %>
+    </table>
+</body>

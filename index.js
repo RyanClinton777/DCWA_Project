@@ -23,7 +23,9 @@ app.get("/ListCountries", (req, res) => {
     //getStudents returns a promise, so we need to handle that here
     mySQLDAO.getCountries(req.params.id)
         .then((result) => {
-            res.send(result);
+            //Render our view, passing in the results into an array in that file.
+            //We don't need to specify .ejs, it knows.
+            res.render("showCountries", { countries: result });
         })
         .catch((error) => {
             res.send(error);

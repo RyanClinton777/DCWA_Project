@@ -1,7 +1,6 @@
 //This file is a DAO (Data access object) - We use it as an abstract interface for our DB
 //Imports
-const { reject } = require("bluebird");
-const { promiseImpl } = require("ejs");
+const { promiseImpl } = require("ejs"); //Promise implimentation from ejs (?)
 var mysql = require("promise-mysql"); //A wrapper for the MySQLJS driver that allows us to use promises.
 
 //https://www.npmjs.com/package/promise-mysql
