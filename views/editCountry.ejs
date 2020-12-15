@@ -1,0 +1,20 @@
+<h1>Edit Country</h1>
+
+<!-- Form for updating a country record on the MySQL DB. -->
+<!-- Uses EJS to display the details from the passed in object. -->
+<!-- Submit sends a post request to /updateCountry, we can get the data from these inputs using their name attributes as handles -->
+<form action="/updateCountry" method="POST">
+    <!-- Code -->
+    <!-- This field is greyed out since it wouldn't make sense for the user to be able to change it -->
+    <!-- 2 ways to do this: disabled and readonly, but disabled stops you from even getting the value programmatically, so we use readonly -->
+    <label>Code:</label>
+    <input value="<%= country.co_code %>" name="code" readonly> <br>
+    <!-- Name -->
+    <label>Name:</label>
+    <input value="<%= country.co_name %>" name="name"> <br>
+    <!-- Details -->
+    <label>Details:</label>
+    <textarea rows="4" cols="60" name="details"><%= country.co_details %></textarea> <br>
+    <!-- Submit Button -->
+    <input type="submit" value="Update Record">
+</form>

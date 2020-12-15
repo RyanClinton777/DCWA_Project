@@ -8,6 +8,7 @@
     }
     td {
         border: solid 2px rgb(154, 154, 154);
+        padding: 5px; /* Space around the contents of every cell, so it doesn't look so squished*/
     }
 </style>
 
@@ -41,9 +42,14 @@
                 <td>
                     <%= country.co_details %>
                 </td>
-                <td>Update</td>
-                <td>Delete</td>
+                <!-- Clicking on these will allow the user to update/delete the item on that row. -->
+                <!-- We append the code of each country to the end of the edit/delete url for each country to pass them in as a parameter. -->
+                <td> <a href="http://localhost:3007/edit/<%= country.co_code %>">Update</a> </td>
+                <td> <a href="http://localhost:3007/delete/<%= country.co_code %>">Delete</a> </td>
             </tr>
             <% }) %>
     </table>
+
+    <!-- Link back to home -->
+    <a href="http://localhost:3007/">Home</a>
 </body>
