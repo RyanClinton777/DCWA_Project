@@ -1,9 +1,19 @@
 <h1>Edit Country</h1>
 
+<!-- Display errors using ejs template.-->
+    <!-- errors is passed in with the get method. -->
+    <% if (errors != undefined) { %>
+        <ul>
+            <% errors.forEach( (error) => { %>
+                <li> <%= error.msg %> </li>
+            <% }) %>  
+        </ul>
+    <% } %>
+
 <!-- Form for updating a country record on the MySQL DB. -->
 <!-- Uses EJS to display the details from the passed in object. -->
-<!-- Submit sends a post request to /updateCountry, we can get the data from these inputs using their name attributes as handles -->
-<form action="/updateCountry" method="POST">
+<!-- Submit sends a post request to /edit, we can get the data from these inputs using their name attributes as handles -->
+<form action="/edit" method="POST">
     <!-- Code -->
     <!-- This field is greyed out since it wouldn't make sense for the user to be able to change it -->
     <!-- 2 ways to do this: disabled and readonly, but disabled stops you from even getting the value programmatically, so we use readonly -->

@@ -4,6 +4,11 @@ var ejs = require("ejs"); //viewing/template engine, used to send views;
 var mySQLDAO = require("./MySQLDAO.js"); //Import our MYSQL DAO
 //body parser middle-ware, to parse and get the data from the body of a request.
 var bodyParser = require("body-parser");
+//express validator middleware, used to validate inputs
+//check is used to check data against constraints
+//validationResult to show if any errors found when checking
+//We can then use EJS to display messages for these errors on the screen, e.g. tell user that name field must have a value etc.
+const { check, validationResult } = require('express-validator');
 
 var app = express(); //handle used to access express methods
 
@@ -49,7 +54,8 @@ app.get("/edit/:id", (req, res) => {
             if (result.length > 0) {
                 //render editCountry view, create a variable called country with the results of the query, which will be the data for the country of given id.
                 //result is an array, even though there is necassarily only one result
-                res.render("editCountry", { country: result[0] });
+                console.log("ATTEMPT: "+ JSON.stringify(country)); //DEBUG
+                res.render("editCountry", { errors: undefined, country: result[0] });
             }
             else {
                 res.send("<h3>No such student with ID " + req.params.id + "</h3>");
@@ -62,19 +68,36 @@ app.get("/edit/:id", (req, res) => {
 });
 ``
 //update country record. Takes data from the body of the request by using body-parser
-app.post("/updateCountry", (req, res) => {
-    console.log("UPDATE: " + req.body.code + ", " + req.body.name + ", " + req.body.details);
+//We use express-validator middleware to validate the inputs
+//name must have a value. ID too but it can't be changed so there no need to check it here.
+app.post("/edit",
+    [check("name").isLength({ min: 1 }).withMessage("Please enter a name")],
+    (req, res) => {
+        //if any errors found in validation chain
+        var errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            //render the page again, but this time we pass in our errors so their messages will be displayed to the user
+            //We pass in the current values as well, so we can keep the ones that were already entered, so the user doesn't lose their work
+            //console.log("FAILED UPDATE: " + req.body.code + ", " + req.body.name + ", " + req.body.details);//DEBUG
+            details = { co_code: req.body.code, co_name: req.body.name, co_details: req.body.details };
+            console.log(details);
+            res.render("editCountry", { errors: errors.errors, country: details });
+        }
+        //else inputs are valid, proceed as normal
+        else {
+            console.log("UPDATE: " + req.body.code + ", " + req.body.name + ", " + req.body.details);//DEBUG
 
-    //Update, pass in new details
-    mySQLDAO.updateCountry(req.body.code, req.body.name, req.body.details)
-        .then((result => {
-            //redirect back to list page
-            res.redirect("/ListCountries");
-        }))
-        .catch( (error) => {
-            res.send(error);
-        });
-});
+            //Update, pass in new details
+            mySQLDAO.updateCountry(req.body.code, req.body.name, req.body.details)
+                .then((result => {
+                    //redirect back to list page
+                    res.redirect("/ListCountries");
+                }))
+                .catch((error) => {
+                    res.send(error);
+                });
+        }
+    });
 
 /*
 app.get("/ListCities", (req, res) => {
