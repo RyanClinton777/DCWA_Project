@@ -77,5 +77,26 @@ var updateCountry = function (id, name, details) {
     });
 }
 
+//delete country of given id
+var deleteCountry = function(id) {
+    //return promise
+    return new promiseImpl((resolve, reject) => {
+        //compose query, using params 
+        var queryObj = {
+            sql: "DELETE FROM country WHERE co_code = ?",
+            values: [id]
+        }
+
+        //Attempt to perform query
+        pool.query(queryObj)
+            .then((result) => {
+                resolve(result);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+}
+
 //Export functions
-module.exports = { getCountries, updateCountry };
+module.exports = { getCountries, updateCountry, deleteCountry};

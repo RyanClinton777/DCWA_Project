@@ -1,14 +1,18 @@
 <style>
     table {
         border: 2px solid rgb(154, 154, 154);
-        border-collapse: collapse; /* Stops different borders from overlapping*/
+        border-collapse: collapse;
+        /* Stops different borders from overlapping*/
     }
+
     th {
         border: solid 2px rgb(154, 154, 154);
     }
+
     td {
         border: solid 2px rgb(154, 154, 154);
-        padding: 5px; /* Space around the contents of every cell, so it doesn't look so squished*/
+        padding: 5px;
+        /* Space around the contents of every cell, so it doesn't look so squished*/
     }
 </style>
 
@@ -44,7 +48,9 @@
                 </td>
                 <!-- Clicking on these will allow the user to update/delete the item on that row. -->
                 <!-- We append the code of each country to the end of the edit/delete url for each country to pass them in as a parameter. -->
+                <!-- ---Update -->
                 <td> <a href="http://localhost:3007/edit/<%= country.co_code %>">Update</a> </td>
+                <!-- ---Delete -->
                 <td> <a href="http://localhost:3007/delete/<%= country.co_code %>">Delete</a> </td>
             </tr>
             <% }) %>
