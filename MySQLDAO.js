@@ -98,5 +98,26 @@ var deleteCountry = function(id) {
     });
 }
 
+//Add a country to the database with given details
+var addCountry = function(code, name, details) {
+    //return promise
+    return new promiseImpl((resolve, reject) => {
+        //compose query, using params 
+        var queryObj = {
+            sql: "INSERT INTO country (co_code, co_name, co_details) VALUES (?, ?, ?)",
+            values: [code, name, details]
+        }
+
+        //Attempt to perform query
+        pool.query(queryObj)
+            .then((result) => {
+                resolve(result);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+}
+
 //Export functions
-module.exports = { getCountries, updateCountry, deleteCountry};
+module.exports = {getCountries, updateCountry, deleteCountry, addCountry};

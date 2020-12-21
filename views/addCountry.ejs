@@ -1,0 +1,20 @@
+<h1>Add Country</h1>
+
+<!-- Errors here later -->
+
+
+<!-- Form for adding a country -->
+<!-- Uses EJS data-binding to remember inputs if the page needs to be rendered again, if there are errors. Default values must be passed in -->
+<form action="/AddCountry" method="POST">
+    <!-- Code -->
+    <label>Code:</label>
+    <input value="<%= co_code %>" name="code"> <br>
+    <!-- Name -->
+    <label>Name:</label>
+    <input value="<%= co_name %>" name="name"> <br>
+    <!-- Details -->
+    <label>Details:</label>
+    <textarea rows="4" cols="60" name="details"><%= co_details %></textarea> <br>
+    <!-- Submit Button -->
+    <input type="submit" value="Add Record">
+</form>

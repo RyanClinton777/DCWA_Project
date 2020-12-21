@@ -65,7 +65,7 @@ app.get("/edit/:id", (req, res) => {
             res.send(error);
         });
 });
-``
+
 //update country record. Takes data from the body of the request by using body-parser
 //We use express-validator middleware to validate the inputs
 //name must have a value. ID too but it can't be changed so there no need to check it here.
@@ -101,22 +101,38 @@ app.post("/edit",
 //Delete the country with the given ID. Even though we are deleting something, the delete method is not appropriate here as you can't call it from a button or hyperlink
 app.get("/delete/:id", (req, res) => {
     mySQLDAO.deleteCountry(req.params.id)
-    .then( (result => {
-        //use "affectedRows" attribute of query result to check if it didn't exist
-        if (result.affectedRows == 0) {
-            res.send("<h3>College with ID " + req.params.collegeID + " does not exist.</h3>");
-        }
-        //redirect back to list page, user will be able to see that the record has been deleted.
-        else res.redirect("/ListCountries");
-    }))
-    .catch( (error) => {
-        //Show specific message if it cna't be deleted due to foreign key constraints
-        if (error.code == "ER_ROW_IS_REFERENCED_2") {
-            res.send("<h3>Cannot delete country with code: ["+req.params.id+"], it has cities.</h3>");
-        }
-        //else just print the message
-        else res.send(error.sqlMessage);
-    })
+        .then((result => {
+            //use "affectedRows" attribute of query result to check if it didn't exist
+            if (result.affectedRows == 0) {
+                res.send("<h3>College with ID " + req.params.collegeID + " does not exist.</h3>");
+            }
+            //redirect back to list page, user will be able to see that the record has been deleted.
+            else res.redirect("/ListCountries");
+        }))
+        .catch((error) => {
+            //Show specific message if it cna't be deleted due to foreign key constraints
+            if (error.code == "ER_ROW_IS_REFERENCED_2") {
+                res.send("<h3>Cannot delete country with code: [" + req.params.id + "], it has cities.</h3>");
+            }
+            //else just print the message
+            else res.send(error.sqlMessage);
+        })
+});
+
+app.get("/AddCountry", (req, res) => {
+    //render view, pass in default values
+    res.render("addCountry", { co_code: "", co_name: "", co_details: "" });
+});
+
+app.post("/AddCountry", (req, res) => {
+    mySQLDAO.addCountry(req.body.code, req.body.name, req.body.details)
+        .then((result => {
+            //redirect back to list page
+            res.redirect("/ListCountries");
+        }))
+        .catch((error => {
+            res.send(error);
+        }));
 })
 
 /*
