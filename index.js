@@ -40,7 +40,11 @@ app.get("/ListCountries", (req, res) => {
             res.render("showCountries", { countries: result });
         })
         .catch((error) => {
-            res.send(error);
+            //Show appropriate error message if database connection fails
+            if (error.code = "ECONNREFUSED") res.send("<h1>ERROR: Connection("+error.syscall+") to "+error.address+":"+error.port+" refused. Database may be offline.</h1>");
+            
+            //else just send the error info
+            else res.send(error);
         });
 });
 
@@ -77,7 +81,6 @@ app.post("/edit",
         if (!errors.isEmpty()) {
             //render the page again, but this time we pass in our errors so their messages will be displayed to the user
             //We pass in the current values as well, so we can keep the ones that were already entered, so the user doesn't lose their work
-            //console.log("FAILED UPDATE: " + req.body.code + ", " + req.body.name + ", " + req.body.details);//DEBUG
             details = { co_code: req.body.code, co_name: req.body.name, co_details: req.body.details };
             console.log(details);
             res.render("editCountry", { errors: errors.errors, country: details });
@@ -119,21 +122,37 @@ app.get("/delete/:id", (req, res) => {
         })
 });
 
+//show form for adding a country to the mysql db
 app.get("/AddCountry", (req, res) => {
-    //render view, pass in default values
-    res.render("addCountry", { co_code: "", co_name: "", co_details: "" });
+    //render view, pass in default values, undefined for errors
+    res.render("addCountry", {errors: undefined, co_code: "", co_name: "", co_details: "" });
 });
 
-app.post("/AddCountry", (req, res) => {
-    mySQLDAO.addCountry(req.body.code, req.body.name, req.body.details)
-        .then((result => {
-            //redirect back to list page
-            res.redirect("/ListCountries");
-        }))
-        .catch((error => {
-            res.send(error);
-        }));
-})
+//If code is not 3 characters long and name is blank, will render the page again and warn user
+app.post("/AddCountry",
+    [check("name").isLength({ min: 1 }).withMessage("Please enter a 3 character code"),
+    check("code").isLength({ min: 3, max: 3 }).withMessage("Please enter a name")],
+    (req, res) => {
+        //Get errors from validation chain, if any
+        var errors = validationResult(req);
+        //if there are any errors
+        if (!errors.isEmpty()) {
+            //render the page again, but this time we pass in our errors so their messages will be displayed to the user
+            //We pass in the current values as well, so we can keep the ones that were already entered, so the user doesn't lose their work
+            res.render("addCountry", { errors: errors.errors, co_code: req.body.code, co_name: req.body.name, co_details: req.body.details });
+        }
+        //else proceed
+        else {
+            mySQLDAO.addCountry(req.body.code, req.body.name, req.body.details)
+                .then((result => {
+                    //redirect back to list page
+                    res.redirect("/ListCountries");
+                }))
+                .catch((error => {
+                    res.send(error);
+                }));
+        }
+    })
 
 /*
 app.get("/ListCities", (req, res) => {

@@ -1,7 +1,14 @@
 <h1>Add Country</h1>
 
-<!-- Errors here later -->
-
+<!-- Display errors using ejs template.-->
+    <!-- errors is passed in with the get method. -->
+    <% if (errors != undefined) { %>
+        <ul>
+            <% errors.forEach( (error) => { %>
+                <li> <%= error.msg %> </li>
+            <% }) %>  
+        </ul>
+    <% } %>
 
 <!-- Form for adding a country -->
 <!-- Uses EJS data-binding to remember inputs if the page needs to be rendered again, if there are errors. Default values must be passed in -->
