@@ -54,7 +54,6 @@ app.get("/edit/:id", (req, res) => {
             if (result.length > 0) {
                 //render editCountry view, create a variable called country with the results of the query, which will be the data for the country of given id.
                 //result is an array, even though there is necassarily only one result
-                console.log("ATTEMPT: "+ JSON.stringify(country)); //DEBUG
                 res.render("editCountry", { errors: undefined, country: result[0] });
             }
             else {
