@@ -47,7 +47,7 @@ app.get("/ListCountries", (req, res) => {
         .then((result) => {
             //Render our view, passing in the results into an array in that file.
             //We don't need to specify .ejs, it knows.
-            res.render("showCountries", { countries: result });
+            res.render("listCountries", { countries: result });
         })
         .catch((error) => {
             //Show appropriate error message if database connection fails
