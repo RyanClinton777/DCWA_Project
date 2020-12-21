@@ -2,6 +2,7 @@
 var express = require("express"); //back-end web app framework
 var ejs = require("ejs"); //viewing/template engine, used to send views;
 var mySQLDAO = require("./MySQLDAO.js"); //Import our MYSQL DAO
+var mongoDBDAO = require("./mongoDBDAO.js"); //Import MongoDB DAO
 //body parser middle-ware, to parse and get the data from the body of a request.
 var bodyParser = require("body-parser");
 //express validator middleware, used to validate inputs
@@ -12,11 +13,12 @@ const { check, validationResult } = require('express-validator');
 
 var app = express(); //handle used to access express methods
 
-/*TODO: 
+/*
+TODO: 
     list heads of state
     add head of state
-    add home button to every page (including with errors?)
-    show detailed message if connection refused at any point
+    add home button to every page (including error displays?)
+    show detailed message if connection refused at any point? (currently only in list pages)
 
 EXTRAS:
     display cities for a country?
@@ -172,7 +174,11 @@ app.get("/ListCities", (req, res) => {
             res.render("ListCities", { cities: result });
         })
         .catch((error) => {
-            res.send(error);
+            //Show appropriate error message if database connection fails
+            if (error.code = "ECONNREFUSED") res.send("<h1>ERROR: Connection(" + error.syscall + ") to " + error.address + ":" + error.port + " refused. Database may be offline.</h1>");
+
+            //else just send the error info
+            else res.send(error);
         });
 });
 
@@ -189,7 +195,7 @@ app.get("/City/:id", (req, res) => {
             mySQLDAO.getCountries(cityResult[0].co_code)
                 .then((countryResult) => {
                     //render view and pass in city and country details
-                    res.render("cityDetails", {city:cityResult[0], country:countryResult[0]});
+                    res.render("cityDetails", { city: cityResult[0], country: countryResult[0] });
                 })
                 .catch((error) => {
                     res.send(error);
@@ -200,7 +206,13 @@ app.get("/City/:id", (req, res) => {
         });
 });
 
-/*app.get("/ListHeadsOfState", (req, res) => {
-
+app.get("/ListHeadsOfState", (req, res) => {
+    mongoDBDAO.getHeadsOfState()
+        .then((documents) => {
+            //render our view, pass our documents into an array called heads.
+            res.render("listHeadsOfState", {heads:documents});
+        })
+        .catch((error) => {
+            res.send(error);
+        });
 });
-*/

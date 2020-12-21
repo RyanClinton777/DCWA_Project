@@ -1,0 +1,49 @@
+<style>
+    table {
+        border: 2px solid rgb(154, 154, 154);
+        border-collapse: collapse;
+        /* Stops different borders from overlapping*/
+    }
+
+    th {
+        border: solid 2px rgb(154, 154, 154);
+    }
+
+    td {
+        border: solid 2px rgb(154, 154, 154);
+        padding: 3px;
+        /* Space around the contents of every cell, so it doesn't look so squished*/
+    }
+</style>
+
+<body>
+    <!-- Header Text -->
+    <h1>Heads of State</h1>
+
+    <!-- Add Head of State button -->
+    <form action="http://localhost:3007/AddHead/" method="get">
+        <input type="submit" value="Add Head" />
+    </form>
+
+    <!-- Table -->
+    <table>
+        <!-- Headers -->
+        <tr>
+            <th>Country Code</th>
+            <th>Head of State</th>
+        </tr>
+        <!-- Data from documents, using EJS -->
+        <% heads.forEach( (head)=>
+            { %>
+                <tr>
+                    <td>
+                        <%= head._id %>
+                    </td>
+                    <td>
+                        <%= head.headOfState %>
+                    </td>
+                </tr>
+            <% }) %>
+    </table>
+
+</body>
