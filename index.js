@@ -12,6 +12,17 @@ const { check, validationResult } = require('express-validator');
 
 var app = express(); //handle used to access express methods
 
+/*TODO: 
+    list heads of state
+    add head of state
+    add home button to every page (including with errors?)
+    show detailed message if connection refused at any point
+
+EXTRAS:
+    display cities for a country?
+    update country?
+*/
+
 //Set view engine
 app.set("view engine", "ejs");
 
@@ -34,15 +45,14 @@ app.get("/ListCountries", (req, res) => {
     //getStudents returns a promise, so we need to handle that here
     mySQLDAO.getCountries(req.params.id)
         .then((result) => {
-            //console.log(result);
             //Render our view, passing in the results into an array in that file.
             //We don't need to specify .ejs, it knows.
             res.render("showCountries", { countries: result });
         })
         .catch((error) => {
             //Show appropriate error message if database connection fails
-            if (error.code = "ECONNREFUSED") res.send("<h1>ERROR: Connection("+error.syscall+") to "+error.address+":"+error.port+" refused. Database may be offline.</h1>");
-            
+            if (error.code = "ECONNREFUSED") res.send("<h1>ERROR: Connection(" + error.syscall + ") to " + error.address + ":" + error.port + " refused. Database may be offline.</h1>");
+
             //else just send the error info
             else res.send(error);
         });
@@ -125,7 +135,7 @@ app.get("/delete/:id", (req, res) => {
 //show form for adding a country to the mysql db
 app.get("/AddCountry", (req, res) => {
     //render view, pass in default values, undefined for errors
-    res.render("addCountry", {errors: undefined, co_code: "", co_name: "", co_details: "" });
+    res.render("addCountry", { errors: undefined, co_code: "", co_name: "", co_details: "" });
 });
 
 //If code is not 3 characters long and name is blank, will render the page again and warn user
@@ -154,12 +164,43 @@ app.post("/AddCountry",
         }
     })
 
-/*
+//Table list of all cities
 app.get("/ListCities", (req, res) => {
-
+    //pass in undefined id to get all cities
+    mySQLDAO.getCities(undefined)
+        .then((result) => {
+            res.render("ListCities", { cities: result });
+        })
+        .catch((error) => {
+            res.send(error);
+        });
 });
 
-app.get("/ListHeadsOfState", (req, res) => {
+//Display all details for city of given id, along with details about its country.
+//This requires two queries, first we get city details, then country details, then render the view and pass those results in.
+//I saw solutions using vm.feed and all that but from what I could tell, the most relatable way to do this was with nested promises
+app.get("/City/:id", (req, res) => {
+    //get city details
+    mySQLDAO.getCities(req.params.id)
+        .then((cityResult) => {
+            //Now that we have the city details, we do another query to get the country details, for the country this city belongs to
+            //get country details
+            //(mysql queries return an array even for one result)
+            mySQLDAO.getCountries(cityResult[0].co_code)
+                .then((countryResult) => {
+                    //render view and pass in city and country details
+                    res.render("cityDetails", {city:cityResult[0], country:countryResult[0]});
+                })
+                .catch((error) => {
+                    res.send(error);
+                });
+        })
+        .catch((error) => {
+            res.send(error);
+        });
+});
+
+/*app.get("/ListHeadsOfState", (req, res) => {
 
 });
 */

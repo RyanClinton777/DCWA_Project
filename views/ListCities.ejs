@@ -1,0 +1,69 @@
+<style>
+    table {
+        border: 2px solid rgb(154, 154, 154);
+        border-collapse: collapse;
+        /* Stops different borders from overlapping*/
+    }
+
+    th {
+        border: solid 2px rgb(154, 154, 154);
+    }
+
+    td {
+        border: solid 2px rgb(154, 154, 154);
+        padding: 3px;
+        /* Space around the contents of every cell, so it doesn't look so squished*/
+    }
+</style>
+
+<body>
+    <h1>Cities</h1>
+
+    <!-- Table -->
+    <table>
+        <!-- Column names at top -->
+        <tr>
+            <th>City Code</th>
+            <th>Country Code</th>
+            <th>City Name</th>
+            <th>Population</th>
+            <th>Coastal</th>
+            <th>Area</th>
+            <th></th>
+        </tr>
+        <!-- define and loop through cities array -->
+        <!-- data is passed in when this view is rendered -->
+        <!-- create a row for each city -->
+        <% cities.forEach((city)=>
+            { %>
+            <tr>
+                <td>
+                    <%= city.cty_code %>
+                </td>
+                <td>
+                    <%= city.co_code %>
+                </td>
+                <td>
+                    <%= city.cty_name %>
+                </td>
+                <td>
+                    <%= city.population %>
+                </td>
+                <td>
+                    <%= city.isCoastal %>
+                </td>
+                <td>
+                    <%= city.areaKM %>
+                </td>
+                <!-- All Details -->
+                <!-- Clicking this will take the user to a page where they can view all of the details for this city -->
+                <td>
+                    <a href="http://localhost:3007/City/<%= city.cty_code %>">All Details</a>
+                </td>
+            </tr>
+            <% }) %>
+    </table>
+</body>
+
+<!-- Link back to home -->
+<a href="http://localhost:3007/">Home</a>

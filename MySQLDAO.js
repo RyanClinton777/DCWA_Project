@@ -26,11 +26,8 @@ mysql.createPool({
         console.log(error);
     });
 
-//return country with given id, or all if id is undefined.
+//return country with given id, or all countries if id is undefined.
 var getCountries = function (id) {
-
-    var i = 1;
-    var i = 1;
     //return a promise for this query so it can run asynchronously
     return new Promise((resolve, reject) => {
         //if no id, return all, else get that country of that id. Used for list page.
@@ -78,7 +75,7 @@ var updateCountry = function (id, name, details) {
 }
 
 //delete country of given id
-var deleteCountry = function(id) {
+var deleteCountry = function (id) {
     //return promise
     return new promiseImpl((resolve, reject) => {
         //compose query, using params 
@@ -99,7 +96,7 @@ var deleteCountry = function(id) {
 }
 
 //Add a country to the database with given details
-var addCountry = function(code, name, details) {
+var addCountry = function (code, name, details) {
     //return promise
     return new promiseImpl((resolve, reject) => {
         //compose query, using params 
@@ -119,5 +116,32 @@ var addCountry = function(code, name, details) {
     });
 }
 
+//get city with given id, or all cities if id is undefined.
+var getCities = function (id) {
+    console.log("ATTEMPT GET CITY: "+id);
+
+    return new Promise((resolve, reject) => {
+        //if id is undefined, return all, else get that city of that id. Used for list page.
+        myQuery = (id == undefined ? "select * from city" : "select * from city where cty_code = ?");
+
+        //put query together
+        var queryObj = {
+            sql: myQuery,
+            values: [id]
+        }
+
+        //execute query
+        pool.query(queryObj)
+            .then((result) => {
+                //query succesful, resolve with data
+                //Note: queries with no matching results are perfectly valid, will be resolved
+                resolve(result);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    })
+}
+
 //Export functions
-module.exports = {getCountries, updateCountry, deleteCountry, addCountry};
+module.exports = { getCountries, updateCountry, deleteCountry, addCountry, getCities };

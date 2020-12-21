@@ -1,0 +1,32 @@
+<!-- Show all details for a City, including full details on the country it is in. -->
+<!-- All text boxes (inputs) are readonly, values can't be changed -->
+<h1>City Details</h1>
+
+<!-- ---CITY--- -->
+<!-- City Code -->
+<label>City Code</label>
+<input value="<%= city.cty_code %>" readonly> <br>
+<!-- City Name -->
+<label>City Name</label>
+<input value="<%= city.cty_name %>" readonly> <br>
+<!-- City Population -->
+<label>City Population</label>
+<input value="<%= city.population %>" readonly> <br>
+<!-- is Coastal? (by the sea) -->
+<label>Is coastal?</label>
+<input value="<%= city.isCoastal %>" readonly> <br>
+<!-- Area (KM) -->
+<label>Area (KM)</label>
+<input value="<%= city.areaKM %>" readonly> <br>
+<br></br>
+
+<!-- ---COUNTRY--- -->
+<!-- Country Code -->
+<label>Country Code</label>
+<input value="<%= country.co_code %>" readonly> <br>
+<!-- Country Name -->
+<label>Country Name</label>
+<input value="<%= country.co_name %>" readonly> <br>
+
+<!-- Link back to home -->
+<br></br><a href="http://localhost:3007/">Home</a>
