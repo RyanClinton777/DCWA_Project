@@ -27,7 +27,7 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
 
 //get all heads of state
 var getHeadsOfState = function () {
-    return new Promise((resolve, rejet) => {
+    return new Promise((resolve, reject) => {
         //Create a cursor object that contains the results of our query and gives us access to mongodb functions
         //we use find() with no args here to get all records from this collection
         var cursor = headsOfState.find();
@@ -43,4 +43,18 @@ var getHeadsOfState = function () {
     })
 }
 
-module.exports = { getHeadsOfState };
+//add head of state with given details
+var addHeadOfState = function (co_code, headOfState) {
+    return new Promise((resolve, reject) => {
+        //insert record - _id here is the country code the head belongs to.
+        headsOfState.insertOne({ "_id": co_code, "headOfState": headOfState })
+            .then((result) => {
+                resolve(result);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+}
+
+module.exports = { getHeadsOfState, addHeadOfState };

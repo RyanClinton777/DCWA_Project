@@ -1,0 +1,19 @@
+<!-- Form for adding a new head of state to the mongodb database -->
+<h1>Add Head of State</h1>
+
+<!-- Errors here later -->
+
+<!-- Form for adding a head of state -->
+<!-- Uses EJS data-binding to remember inputs if the page needs to be rendered again, if there are errors. Default values must be passed in -->
+<form action="/AddHead" method="POST">
+    <!-- Code -->
+    <label>Country Code:</label>
+    <input name="code"> <br>
+    <!-- Name -->
+    <label>Head of State:</label>
+    <input name="head"> <br>
+    <input type="submit" value="Add Record">
+</form>
+
+<!-- Link back to home -->
+<a href="http://localhost:3007/">Home</a>

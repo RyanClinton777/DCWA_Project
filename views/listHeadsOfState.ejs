@@ -32,7 +32,8 @@
             <th>Country Code</th>
             <th>Head of State</th>
         </tr>
-        <!-- Data from documents, using EJS -->
+        <!-- Create row with data from each document, using EJS -->
+        <!-- Data must be passed into "heads" when this view is rendered -->
         <% heads.forEach( (head)=>
             { %>
                 <tr>

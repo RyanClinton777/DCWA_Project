@@ -15,7 +15,6 @@ var app = express(); //handle used to access express methods
 
 /*
 TODO: 
-    list heads of state
     add head of state
     add home button to every page (including error displays?)
     show detailed message if connection refused at any point? (currently only in list pages)
@@ -140,7 +139,7 @@ app.get("/AddCountry", (req, res) => {
     res.render("addCountry", { errors: undefined, co_code: "", co_name: "", co_details: "" });
 });
 
-//If code is not 3 characters long and name is blank, will render the page again and warn user
+//Add country - If code is not 3 characters long and/or name is blank, will render the page again and warn user
 app.post("/AddCountry",
     [check("name").isLength({ min: 1 }).withMessage("Please enter a 3 character code"),
     check("code").isLength({ min: 3, max: 3 }).withMessage("Please enter a name")],
@@ -164,7 +163,7 @@ app.post("/AddCountry",
                     res.send(error);
                 }));
         }
-    })
+    });
 
 //Table list of all cities
 app.get("/ListCities", (req, res) => {
@@ -210,7 +209,40 @@ app.get("/ListHeadsOfState", (req, res) => {
     mongoDBDAO.getHeadsOfState()
         .then((documents) => {
             //render our view, pass our documents into an array called heads.
-            res.render("listHeadsOfState", {heads:documents});
+            res.render("listHeadsOfState", { heads: documents });
+        })
+        .catch((error) => {
+            res.send(error);
+        });
+});
+
+app.get("/AddHead", (req, res) => {
+    //render view
+    res.render("addHeadOfState");
+});
+
+//Add head - Country code must be 3 characters, head of states name at least 3.
+//Checks the mysql country database to make sure the specified country exists, only then will it be created (unless the head themselves already exists).
+app.post("/AddHead", (req, res) => {
+    //check if country for given code exists
+    mySQLDAO.getCountries(req.body.code)
+        .then((result) => {
+            //(IF NO ERRORS LOGIC HERE)
+
+            //Can only add a HOS If their country exists (can only be 1 result since it's a primary key)
+            if (result.length == 1) {
+                //Add the record using data from the body of the request, from the input form
+                mongoDBDAO.addHeadOfState(req.body.code, req.body.head)
+                    .then((result) => {
+                        res.redirect("/ListHeadsOfState");
+                    })
+                    .catch((error) => {
+                        res.send(error);
+                    });
+            }
+            else {
+                res.send("COUNTRY NOT EXIST");
+            }
         })
         .catch((error) => {
             res.send(error);
