@@ -15,11 +15,10 @@ var app = express(); //handle used to access express methods
 
 /*
 TODO: 
-    add head of state
     add home button to every page (including error displays?)
     show detailed message if connection refused at any point? (currently only in list pages)
-
 EXTRAS:
+    Handle the user trying to add a head of state to a country that already has one (i.e. existing _id)
     display cities for a country?
     update country?
 */
@@ -217,34 +216,53 @@ app.get("/ListHeadsOfState", (req, res) => {
 });
 
 app.get("/AddHead", (req, res) => {
-    //render view
-    res.render("addHeadOfState");
+    //render view, pass in defaults
+    res.render("addHeadOfState", { errors: undefined, co_code: "", headOfState: "" });
 });
 
 //Add head - Country code must be 3 characters, head of states name at least 3.
 //Checks the mysql country database to make sure the specified country exists, only then will it be created (unless the head themselves already exists).
-app.post("/AddHead", (req, res) => {
-    //check if country for given code exists
-    mySQLDAO.getCountries(req.body.code)
-        .then((result) => {
-            //(IF NO ERRORS LOGIC HERE)
-
-            //Can only add a HOS If their country exists (can only be 1 result since it's a primary key)
-            if (result.length == 1) {
-                //Add the record using data from the body of the request, from the input form
-                mongoDBDAO.addHeadOfState(req.body.code, req.body.head)
-                    .then((result) => {
-                        res.redirect("/ListHeadsOfState");
-                    })
-                    .catch((error) => {
-                        res.send(error);
-                    });
-            }
-            else {
-                res.send("COUNTRY NOT EXIST");
-            }
-        })
-        .catch((error) => {
-            res.send(error);
-        });
-});
+app.post("/AddHead",
+    [check("head").isLength({ min: 3 }).withMessage("Name must have at least 3 characters."),
+    check("code").isLength({ min: 3, max: 3 }).withMessage("Please enter a 3 character country code.")],
+    (req, res) => {
+        //Get errors array (JSON) from validation chain, if any
+        var errors = validationResult(req);
+        //if there are any errors
+        if (!errors.isEmpty()) {
+            //render the page again, but this time we pass in our errors so their messages will be displayed to the user
+            //We pass in the current values as well, so we can keep the ones that were already entered, so the user doesn't lose their work
+            console.log("ERRORS: "+ JSON.stringify(errors.mapped()) );
+            res.render("addHeadOfState", { errors: errors.errors, co_code: req.body.code, headOfState: req.body.head });
+        }
+        else {
+            //check if country for given code exists
+            mySQLDAO.getCountries(req.body.code)
+                .then((result) => {
+                    //Can only add a HOS If their country exists (can only be 1 result since it's a primary key)
+                    if (result.length == 1) {
+                        //Add the record using data from the body of the request, from the input form
+                        mongoDBDAO.addHeadOfState(req.body.code, req.body.head)
+                            .then((result) => {
+                                res.redirect("/ListHeadsOfState");
+                            })
+                            .catch((error) => {
+                                res.send(error);
+                            });
+                    }
+                    //Else if the country doesn't exist, render page again with custom warning
+                    else {
+                        //If the country does not exist, it should show an error message
+                        //To do this, I am creating putting a custom, made-up error document and passing it into errors.errors, since it is just JSON. (errors field in the errors JSON object)
+                        //I don't know if this is the best way to do this but I wasn't having much success googling it
+                        errors.errors.push( {value:"",msg:"No country with that code exists in the MySQL database.",param:"custom",location:"body"});
+                        //console.log( JSON.stringify(errors) ); //DEBUG
+                        //Render page again with current values and our custom error document inside the errors object.
+                        res.render("addHeadOfState", { errors: errors.errors, co_code: req.body.code, headOfState: req.body.head });
+                    }
+                })
+                .catch((error) => {
+                    res.send(error);
+                });
+        }
+    });
