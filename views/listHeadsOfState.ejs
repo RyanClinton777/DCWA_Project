@@ -22,7 +22,7 @@
 
     <!-- Add Head of State button -->
     <form action="http://localhost:3007/AddHead/" method="get">
-        <input type="submit" value="Add Head" />
+        <input type="submit" value="Add Head of State" />
     </form>
 
     <!-- Table -->
@@ -36,15 +36,17 @@
         <!-- Data must be passed into "heads" when this view is rendered -->
         <% heads.forEach( (head)=>
             { %>
-                <tr>
-                    <td>
-                        <%= head._id %>
-                    </td>
-                    <td>
-                        <%= head.headOfState %>
-                    </td>
-                </tr>
+            <tr>
+                <td>
+                    <%= head._id %>
+                </td>
+                <td>
+                    <%= head.headOfState %>
+                </td>
+            </tr>
             <% }) %>
     </table>
 
+    <!-- Link back to home -->
+    <a href="http://localhost:3007/">Home</a>
 </body>

@@ -16,9 +16,10 @@ var app = express(); //handle used to access express methods
 /*
 TODO: 
     add home button to every page (including error displays?)
-    show detailed message if connection refused at any point? (currently only in list pages)
+    show detailed message if connection refused at any point? (currently only in list pages) (use a view)
 EXTRAS:
     Handle the user trying to add a head of state to a country that already has one (i.e. existing _id)
+       auto UPPER CASE the country code?
     display cities for a country?
     update country?
 */
@@ -51,7 +52,7 @@ app.get("/ListCountries", (req, res) => {
         })
         .catch((error) => {
             //Show appropriate error message if database connection fails
-            if (error.code = "ECONNREFUSED") res.send("<h1>ERROR: Connection(" + error.syscall + ") to " + error.address + ":" + error.port + " refused. Database may be offline.</h1>");
+            if (error.code = "ECONNREFUSED") res.send("<h2>ERROR: Connection(" + error.syscall + ") to " + error.address + ":" + error.port + " refused. Database may be offline.</h2>");
 
             //else just send the error info
             else res.send(error);
@@ -123,9 +124,9 @@ app.get("/delete/:id", (req, res) => {
             else res.redirect("/ListCountries");
         }))
         .catch((error) => {
-            //Show specific message if it cna't be deleted due to foreign key constraints
+            //Show specific message if it can't be deleted due to foreign key constraints
             if (error.code == "ER_ROW_IS_REFERENCED_2") {
-                res.send("<h3>Cannot delete country with code: [" + req.params.id + "], it has cities.</h3>");
+                res.send("<h3>Cannot delete country with code: [" + req.params.id + "], there are cities associated with it.</h3>");
             }
             //else just print the message
             else res.send(error.sqlMessage);
@@ -140,8 +141,8 @@ app.get("/AddCountry", (req, res) => {
 
 //Add country - If code is not 3 characters long and/or name is blank, will render the page again and warn user
 app.post("/AddCountry",
-    [check("name").isLength({ min: 1 }).withMessage("Please enter a 3 character code"),
-    check("code").isLength({ min: 3, max: 3 }).withMessage("Please enter a name")],
+    [check("code").isLength({ min: 3, max: 3 }).withMessage("Please enter a 3 character code"),
+    check("name").isLength({ min: 1 }).withMessage("Please enter a name")],
     (req, res) => {
         //Get errors from validation chain, if any
         var errors = validationResult(req);
@@ -153,14 +154,31 @@ app.post("/AddCountry",
         }
         //else proceed
         else {
-            mySQLDAO.addCountry(req.body.code, req.body.name, req.body.details)
-                .then((result => {
-                    //redirect back to list page
-                    res.redirect("/ListCountries");
-                }))
-                .catch((error => {
+            //But first, make sure country doesn't already exist
+            mySQLDAO.getCountries(req.body.code)
+                .then((result) => {
+                    //if length isn't 0, country exists so error should be displayed
+                    if (result.length > 0) {
+                        //add custom error and render page again
+                        errors.errors.push({ value: "", msg: "Country with that code already exists.", param: "custom", location: "body" });
+                        res.render("addCountry", { errors: errors.errors, co_code: req.body.code, co_name: req.body.name, co_details: req.body.details });
+                    }
+                    //else country doesn't exist, can add this new one
+                    else {
+                        //Finally add the country
+                        mySQLDAO.addCountry(req.body.code, req.body.name, req.body.details)
+                            .then((result => {
+                                //redirect back to list page
+                                res.redirect("/ListCountries");
+                            }))
+                            .catch((error => {
+                                res.send(error);
+                            }));
+                    }
+                })
+                .catch((error) => {
                     res.send(error);
-                }));
+                });
         }
     });
 
@@ -232,7 +250,7 @@ app.post("/AddHead",
         if (!errors.isEmpty()) {
             //render the page again, but this time we pass in our errors so their messages will be displayed to the user
             //We pass in the current values as well, so we can keep the ones that were already entered, so the user doesn't lose their work
-            console.log("ERRORS: "+ JSON.stringify(errors.mapped()) );
+            console.log("ERRORS: " + JSON.stringify(errors.mapped()));
             res.render("addHeadOfState", { errors: errors.errors, co_code: req.body.code, headOfState: req.body.head });
         }
         else {
@@ -255,7 +273,7 @@ app.post("/AddHead",
                         //If the country does not exist, it should show an error message
                         //To do this, I am creating putting a custom, made-up error document and passing it into errors.errors, since it is just JSON. (errors field in the errors JSON object)
                         //I don't know if this is the best way to do this but I wasn't having much success googling it
-                        errors.errors.push( {value:"",msg:"No country with that code exists in the MySQL database.",param:"custom",location:"body"});
+                        errors.errors.push({ value: "", msg: "No country with that code exists in the MySQL database.", param: "custom", location: "body" });
                         //console.log( JSON.stringify(errors) ); //DEBUG
                         //Render page again with current values and our custom error document inside the errors object.
                         res.render("addHeadOfState", { errors: errors.errors, co_code: req.body.code, headOfState: req.body.head });
