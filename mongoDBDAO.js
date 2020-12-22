@@ -25,12 +25,17 @@ MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
         console.log(error);
     });
 
-//get all heads of state
+    //get all heads of state
 var getHeadsOfState = function () {
     return new Promise((resolve, reject) => {
+        //If connection fails, reject with error message (will be treated like a normal error).
+        //Connection will still be undefined if the connection failed
+        //Note: I only just found out about template literals, in case you are suspicious of them only showing up in some of the code
+        if (headsOfStateDB == undefined) reject("Connection to ${url} failed.");
+        
         //Create a cursor object that contains the results of our query and gives us access to mongodb functions
         //we use find() with no args here to get all records from this collection
-        var cursor = headsOfState.find();
+        var cursor = headsOfState.find()
 
         //We can move the cursor around in the result set, but here we just want to return the whole thing as an array. 
         cursor.toArray()
@@ -46,6 +51,10 @@ var getHeadsOfState = function () {
 //add head of state with given details
 var addHeadOfState = function (co_code, headOfState) {
     return new Promise((resolve, reject) => {
+        //If connection fails, reject with error message (will be treated like a normal error).
+        //Connection will still be undefined if the connection failed
+        if (headsOfStateDB == undefined) reject("Connection to ${url} failed.");
+        
         //insert record - _id here is the country code the head belongs to.
         headsOfState.insertOne({ "_id": co_code, "headOfState": headOfState })
             .then((result) => {

@@ -14,22 +14,33 @@ const { check, validationResult } = require('express-validator');
 var app = express(); //handle used to access express methods
 
 /*
-TODO: 
-    add home button to every page (including error displays?)
-    show detailed message if connection refused at any point? (currently only in list pages) (use a view)
+TODO:
 EXTRAS:
-    Handle the user trying to add a head of state to a country that already has one (i.e. existing _id)
+    Handle the user trying to add a head of state to a country that already has one (i.e. existing _id) - findOne, query for that id, custom error etc.
        auto UPPER CASE the country code?
-    display cities for a country?
+    display cities attatched to a country? - button on table list
     update country?
 */
 
 //Set view engine
 app.set("view engine", "ejs");
-
 //set bodyParser
 //https://www.npmjs.com/package/body-parser#bodyparserurlencodedoptions
 app.use(bodyParser.urlencoded({ extended: false }))
+
+//HANDLE ERRORS
+//Done in method here to avoid repetition and ensure consistency
+//renders errorDisplay view, passing in either the normal error message, or a special message if the connection doesn't go through, as per the requirements
+//Errors should be sent to this function: ---handleError(res, error);--- or can manually render errorDisplay and pass in a specific message string
+//I did it this way to satisfy the requirement of showing a specific message if the connection didn't go through
+var handleError = function (res, error) {
+    //Database connection fails
+    if (error.code == "ECONNREFUSED") {
+        res.render("errorDisplay", { errorMessage: "ERROR: Connection(" + error.syscall + ") to " + error.address + ":" + error.port + " refused. Database may be offline." });
+    }
+    //else show generic error info
+    else res.render("errorDisplay", { errorMessage: error });
+}
 
 //listen on port 3007
 app.listen(3007, () => {
@@ -51,11 +62,7 @@ app.get("/ListCountries", (req, res) => {
             res.render("listCountries", { countries: result });
         })
         .catch((error) => {
-            //Show appropriate error message if database connection fails
-            if (error.code = "ECONNREFUSED") res.send("<h2>ERROR: Connection(" + error.syscall + ") to " + error.address + ":" + error.port + " refused. Database may be offline.</h2>");
-
-            //else just send the error info
-            else res.send(error);
+            handleError(res, error);
         });
 });
 
@@ -72,12 +79,13 @@ app.get("/edit/:id", (req, res) => {
                 res.render("editCountry", { errors: undefined, country: result[0] });
             }
             else {
-                res.send("<h3>No such student with ID " + req.params.id + "</h3>");
+                //Not an actual error, but use the error display anyway to warn user
+                res.render("errorDisplay", { errorMessage: "Country with ID: [" + req.params.id + "] doesn't exist." });
             }
         })
         //ditto but rejection, and error
-        .catch((error) => {
-            res.send(error);
+        .catch(() => {
+            handleError(res, error);
         });
 });
 
@@ -107,7 +115,7 @@ app.post("/edit",
                     res.redirect("/ListCountries");
                 }))
                 .catch((error) => {
-                    res.send(error);
+                    handleError(res, error);
                 });
         }
     });
@@ -129,7 +137,7 @@ app.get("/delete/:id", (req, res) => {
                 res.send("<h3>Cannot delete country with code: [" + req.params.id + "], there are cities associated with it.</h3>");
             }
             //else just print the message
-            else res.send(error.sqlMessage);
+            else handleError(res, error);
         })
 });
 
@@ -172,12 +180,12 @@ app.post("/AddCountry",
                                 res.redirect("/ListCountries");
                             }))
                             .catch((error => {
-                                res.send(error);
+                                handleError(res, error);
                             }));
                     }
                 })
                 .catch((error) => {
-                    res.send(error);
+                    handleError(res, error);
                 });
         }
     });
@@ -190,11 +198,7 @@ app.get("/ListCities", (req, res) => {
             res.render("ListCities", { cities: result });
         })
         .catch((error) => {
-            //Show appropriate error message if database connection fails
-            if (error.code = "ECONNREFUSED") res.send("<h1>ERROR: Connection(" + error.syscall + ") to " + error.address + ":" + error.port + " refused. Database may be offline.</h1>");
-
-            //else just send the error info
-            else res.send(error);
+            handleError(res, error);
         });
 });
 
@@ -214,11 +218,11 @@ app.get("/City/:id", (req, res) => {
                     res.render("cityDetails", { city: cityResult[0], country: countryResult[0] });
                 })
                 .catch((error) => {
-                    res.send(error);
+                    handleError(res, error);
                 });
         })
         .catch((error) => {
-            res.send(error);
+            handleError(res, error);
         });
 });
 
@@ -229,7 +233,7 @@ app.get("/ListHeadsOfState", (req, res) => {
             res.render("listHeadsOfState", { heads: documents });
         })
         .catch((error) => {
-            res.send(error);
+            handleError(res, error);
         });
 });
 
@@ -265,7 +269,7 @@ app.post("/AddHead",
                                 res.redirect("/ListHeadsOfState");
                             })
                             .catch((error) => {
-                                res.send(error);
+                                handleError(res, error);
                             });
                     }
                     //Else if the country doesn't exist, render page again with custom warning
@@ -280,7 +284,7 @@ app.post("/AddHead",
                     }
                 })
                 .catch((error) => {
-                    res.send(error);
+                    handleError(res, error);
                 });
         }
     });
