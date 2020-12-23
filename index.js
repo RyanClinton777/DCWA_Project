@@ -16,11 +16,9 @@ var app = express(); //handle used to access express methods
 /*
 TODO:
 EXTRAS:
-    Handle the user trying to add a head of state to a country that already has one (i.e. existing _id) - findOne, query for that id, custom error etc.
-       auto UPPER CASE the country code?
+    auto UPPER CASE the country code?
     display cities attatched to a country? - button on table list
     update country?
-    Fix up the HTML formatting
 */
 
 //Set view engine
@@ -252,6 +250,7 @@ app.get("/AddHead", (req, res) => {
 
 //Add head - Country code must be 3 characters, head of states name at least 3.
 //Checks the mysql country database to make sure the specified country exists, only then will it be created (unless the head themselves already exists).
+//EXTRA: Checks if a head of state with the given ID exists, didn't see this in the requirements.
 app.post("/AddHead",
     [check("head").isLength({ min: 3 }).withMessage("Name must have at least 3 characters."),
     check("code").isLength({ min: 3, max: 3 }).withMessage("Please enter a 3 character country code.")],
@@ -262,19 +261,37 @@ app.post("/AddHead",
         if (!errors.isEmpty()) {
             //render the page again, but this time we pass in our errors so their messages will be displayed to the user
             //We pass in the current values as well, so we can keep the ones that were already entered, so the user doesn't lose their work
-            console.log("ERRORS: " + JSON.stringify(errors.mapped()));
             res.render("addHeadOfState", { errors: errors.errors, co_code: req.body.code, headOfState: req.body.head });
         }
+        //Inputs valid, proceed to try to add them.
+        //1. Make sure country exists
+        //2. Make sure that country doesn't already have a head of state
+        //3. if 1 and 2 true, add the new head of state.
         else {
-            //check if country for given code exists
+            //1. check if country for given code exists
             mySQLDAO.getCountries(req.body.code)
                 .then((result) => {
                     //Can only add a HOS If their country exists (can only be 1 result since it's a primary key)
                     if (result.length == 1) {
-                        //Add the record using data from the body of the request, from the input form
-                        mongoDBDAO.addHeadOfState(req.body.code, req.body.head)
+                        //2. EXTRA: Now that we know that everything is valid and the country exists, make sure there isn't already a head with that _id
+                        mongoDBDAO.getHeadOfState(req.body.code)
                             .then((result) => {
-                                res.redirect("/ListHeadsOfState");
+                                //If result isn't null, country already has a head of state (_id is taken), render page again and warn user
+                                if (result != null) { 
+                                    errors.errors.push({ value: "", msg: "A head of state already exists for that country.", param: "custom", location: "body" });
+                                    res.render("addHeadOfState", { errors: errors.errors, co_code: req.body.code, headOfState: req.body.head });
+                                }
+                                //else all inputs valid, country exists and it doesn't have a head - Can finally add it.
+                                else{
+                                        //3. Add the record using data from the body of the request, from the input form
+                                        mongoDBDAO.addHeadOfState(req.body.code, req.body.head)
+                                            .then((result) => {
+                                                res.redirect("/ListHeadsOfState");
+                                            })
+                                            .catch((error) => {
+                                                handleError(res, error);
+                                            });
+                                    }
                             })
                             .catch((error) => {
                                 handleError(res, error);
