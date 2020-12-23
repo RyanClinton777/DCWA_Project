@@ -1,30 +1,46 @@
-<h1>Add Country</h1>
+<head>
+    <!-- CSS -->
+    <!-- To use static files in ejs files, must "use" them through the "static" middleware in our main js file. -->
+    <link rel="stylesheet" href="/public/assets/styles.css">
+</head>
 
-<!-- Display errors using ejs template.-->
+<body>
+    <h1>Add Country</h1>
+
+    <!-- Display errors using ejs template.-->
     <!-- errors is passed in with the get method. -->
-    <% if (errors != undefined) { %>
+    <% if (errors !=undefined) { %>
         <ul>
-            <% errors.forEach( (error) => { %>
-                <li> <%= error.msg %> </li>
-            <% }) %>  
+            <% errors.forEach( (error)=> { %>
+                <li>
+                    <%= error.msg %>
+                </li>
+                <% }) %>
         </ul>
-    <% } %>
+        <% } %>
 
-<!-- Form for adding a country -->
-<!-- Uses EJS data-binding to remember inputs if the page needs to be rendered again, if there are errors. Default values must be passed in -->
-<form action="/AddCountry" method="POST">
-    <!-- Code -->
-    <label>Code:</label>
-    <input value="<%= co_code %>" name="code"> <br>
-    <!-- Name -->
-    <label>Name:</label>
-    <input value="<%= co_name %>" name="name"> <br>
-    <!-- Details -->
-    <label>Details:</label>
-    <textarea rows="4" cols="60" name="details"><%= co_details %></textarea> <br>
-    <!-- Submit Button -->
-    <input type="submit" value="Add Record">
-</form>
+            <!-- Form for adding a country -->
+            <!-- Uses EJS data-binding to remember inputs if the page needs to be rendered again, if there are errors. Default values must be passed in -->
+            <form action="/AddCountry" method="POST">
+                <!-- Code -->
+                <p>
+                    <label for="code">Code:</label>
+                    <input value="<%= co_code %>" name="code" id=code> <br>
+                </p>
+                <!-- Name -->
+                <p>
+                    <label>Name:</label>
+                    <input value="<%= co_name %>" name="name"> <br>
+                <p>
+                    <!-- Details -->
+                <p>
+                    <label>Details:</label>
+                    <textarea rowspan = "4", rows="4" cols="60" name="details"><%= co_details %></textarea> <br>
+                </p>
+                <!-- Submit Button -->
+                    <input type="submit" value="Add Record">
+            </form>
 
-<!-- Link back to home -->
-<br></br><a href="http://localhost:3007/">Home</a>
+            <!-- Link back to home -->
+            <a href="http://localhost:3007/">Home</a>
+</body>

@@ -1,3 +1,9 @@
+<head>
+    <!-- CSS -->
+    <!-- To use static files in ejs files, must "use" them through the "static" middleware in our main js file. -->
+    <link rel="stylesheet" href="/public/assets/styles.css">
+</head>
+
 <body>
     <div>
         <!-- Show all details for a City, including full details on the country it is in. -->
@@ -5,30 +11,46 @@
         <h1>City Details</h1>
 
         <!-- ---CITY--- -->
-        <!-- City Code -->
-        <label>City Code</label>
-        <input value="<%= city.cty_code %>" readonly> <br>
-        <!-- City Name -->
-        <label>City Name</label>
-        <input value="<%= city.cty_name %>" readonly> <br>
-        <!-- City Population -->
-        <label>City Population</label>
-        <input value="<%= city.population %>" readonly> <br>
-        <!-- is Coastal? (by the sea) -->
-        <label>Is coastal?</label>
-        <input value="<%= city.isCoastal %>" readonly> <br>
-        <!-- Area (KM) -->
-        <label>Area (KM)</label>
-        <input value="<%= city.areaKM %>" readonly> <br>
-        <br></br>
+        <table>
+            <!-- City Code -->
+            <p>
+                <label>City Code</label>
+                <input value="<%= city.cty_code %>" readonly>
+            </p>
+            <!-- City Name -->
+            <p>
+                <label>City Name</label>
+                <input value="<%= city.cty_name %>" readonly>
+            </p>
+            <!-- City Population -->
+            <p>
+                <label>City Population</label>
+                <input value="<%= city.population %>" readonly>
+            </p>
+            <!-- is Coastal? (by the sea) -->
+            <p>
+                <label>Is coastal?</label>
+                <input value="<%= city.isCoastal %>" readonly>
+            </p>
+            <!-- Area (KM) -->
+            <p>
+                <label>Area (KM)</label>
+                <input value="<%= city.areaKM %>" readonly>
+            </p>
+            <br></br>
 
-        <!-- ---COUNTRY--- -->
-        <!-- Country Code -->
-        <label>Country Code</label>
-        <input value="<%= country.co_code %>" readonly> <br>
-        <!-- Country Name -->
-        <label>Country Name</label>
-        <input value="<%= country.co_name %>" readonly> <br>
+            <!-- ---COUNTRY--- -->
+            <!-- Country Code -->
+            <p>
+                <label>Country Code</label>
+                <input value="<%= country.co_code %>" readonly>
+            </p>
+            <!-- Country Name -->
+            <p>
+                <label>Country Name</label>
+                <input value="<%= country.co_name %>" readonly>
+            </p>
+        </table>
     </div>
 
     <!-- Link back to home -->

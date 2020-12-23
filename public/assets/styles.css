@@ -1,0 +1,21 @@
+/* CSS adapted from https://jsfiddle.net/DaS39/1/, one of the answers on https://stackoverflow.com/questions/4309950/how-to-align-input-forms-in-html */
+/* The display property lets us display elements as if they were others, so here we are treating this form as if it is a table, helps line up the inputs, scale to different font sizes etc. */
+/* label in left cell, input in right */
+
+form {
+    display: table;
+    border-spacing: 3px;
+}
+
+p {
+    display: table-row;
+}
+
+label {
+    display: table-cell;
+    padding: 3px;
+}
+
+input {
+    display: table-cell;
+}

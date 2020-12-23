@@ -20,13 +20,21 @@ EXTRAS:
        auto UPPER CASE the country code?
     display cities attatched to a country? - button on table list
     update country?
+    Fix up the HTML formatting
 */
 
 //Set view engine
 app.set("view engine", "ejs");
+
+//---MIDDLEWARE---
 //set bodyParser
 //https://www.npmjs.com/package/body-parser#bodyparserurlencodedoptions
 app.use(bodyParser.urlencoded({ extended: false }))
+
+//Static folder
+//Use public folder so we can access CSS (adapted from answer to https://stackoverflow.com/questions/18629327/adding-css-file-to-ejs)
+//Basically we need to set a folder for our static files for ejs. here we are using the "public" folder. I think you can do it for individual files too but this is simple.
+app.use('/public', express.static('public'));
 
 //HANDLE ERRORS
 //Done in method here to avoid repetition and ensure consistency
