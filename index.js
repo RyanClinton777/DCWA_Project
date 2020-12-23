@@ -11,14 +11,12 @@ var bodyParser = require("body-parser");
 //We can then use EJS to display messages for these errors on the screen, e.g. tell user that name field must have a value etc.
 const { check, validationResult } = require('express-validator');
 
-var app = express(); //handle used to access express methods
+var app = express(); //handle used to access express functions
 
 /*
 TODO:
 EXTRAS:
-    auto UPPER CASE the country code?
     display cities attatched to a country? - button on table list
-    update country?
 */
 
 //Set view engine
@@ -208,6 +206,19 @@ app.get("/ListCities", (req, res) => {
         });
 });
 
+//EXTRA 4: Show cities for a given country
+app.get("/ListCities/:id", (req, res) => {
+    //pass in undefined id to get all cities
+    mySQLDAO.getCountryCities(req.params.id)
+        .then((result) => {
+            //Render ListCities view with our cities for this country
+            res.render("ListCities", { cities: result });
+        })
+        .catch((error) => {
+            handleError(res, error);
+        });
+});
+
 //Display all details for city of given id, along with details about its country.
 //This requires two queries, first we get city details, then country details, then render the view and pass those results in.
 //I saw solutions using vm.feed and all that but from what I could tell, the most relatable way to do this was with nested promises
@@ -250,11 +261,14 @@ app.get("/AddHead", (req, res) => {
 
 //Add head - Country code must be 3 characters, head of states name at least 3.
 //Checks the mysql country database to make sure the specified country exists, only then will it be created (unless the head themselves already exists).
-//EXTRA: Checks if a head of state with the given ID exists, didn't see this in the requirements.
+//EXTRA 2: Checks if a head of state with the given ID exists, didn't see this in the requirements.
 app.post("/AddHead",
     [check("head").isLength({ min: 3 }).withMessage("Name must have at least 3 characters."),
     check("code").isLength({ min: 3, max: 3 }).withMessage("Please enter a 3 character country code.")],
     (req, res) => {
+        //EXTRA 3: Convert the input country code to uppercase 
+        req.body.code = req.body.code.toUpperCase();
+
         //Get errors array (JSON) from validation chain, if any
         var errors = validationResult(req);
         //if there are any errors
@@ -273,7 +287,7 @@ app.post("/AddHead",
                 .then((result) => {
                     //Can only add a HOS If their country exists (can only be 1 result since it's a primary key)
                     if (result.length == 1) {
-                        //2. EXTRA: Now that we know that everything is valid and the country exists, make sure there isn't already a head with that _id
+                        //2. EXTRA 2: Now that we know that everything is valid and the country exists, make sure there isn't already a head with that _id
                         mongoDBDAO.getHeadOfState(req.body.code)
                             .then((result) => {
                                 //If result isn't null, country already has a head of state (_id is taken), render page again and warn user

@@ -34,6 +34,7 @@
             <th>Details</th>
             <th>Action</th>
             <th></th>
+            <th></th>
         </tr>
         <!-- define and loop through country array -->
         <!-- data is passed in when this view is rendered -->
@@ -57,10 +58,16 @@
                 <td> <a href="http://localhost:3007/edit/<%= country.co_code %>">Update</a> </td>
                 <!-- ---Delete -->
                 <td> <a href="http://localhost:3007/delete/<%= country.co_code %>">Delete</a> </td>
+                <!-- EXTRA 4: View Cities -->
+                <td> <a href="http://localhost:3007/listCities/<%= country.co_code %>">Cities</a> </td>
             </tr>
             <% }) %>
     </table>
-
+    
+    <!-- Display number of results -->
+    <label>
+        <%= countries.length %> Results.
+    </label></br>
     <!-- Link back to home -->
     <a href="http://localhost:3007/">Home</a>
 </body>

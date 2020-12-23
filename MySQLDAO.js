@@ -118,8 +118,6 @@ var addCountry = function (code, name, details) {
 
 //get city with given id, or all cities if id is undefined.
 var getCities = function (id) {
-    console.log("ATTEMPT GET CITY: "+id);
-
     return new Promise((resolve, reject) => {
         //if id is undefined, return all, else get that city of that id. Used for list page.
         myQuery = (id == undefined ? "select * from city" : "select * from city where cty_code = ?");
@@ -143,5 +141,27 @@ var getCities = function (id) {
     })
 }
 
+//EXTRA 4: Get cities for given country.
+var getCountryCities = function(country) {
+    return new Promise((resolve, reject) => {
+        //put query together
+        var queryObj = {
+            sql: "select * from city where co_code = ?",
+            values: [country]
+        }
+
+        //execute query
+        pool.query(queryObj)
+            .then((result) => {
+                //query succesful, resolve with data
+                //Note: queries with no matching results are perfectly valid, will be resolved
+                resolve(result);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    })
+}
+
 //Export functions
-module.exports = { getCountries, updateCountry, deleteCountry, addCountry, getCities };
+module.exports = { getCountries, updateCountry, deleteCountry, addCountry, getCities, getCountryCities };

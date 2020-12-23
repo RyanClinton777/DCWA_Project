@@ -48,7 +48,7 @@ var getHeadsOfState = function () {
     })
 }
 
-//get head of state for given country code
+//EXTRA 2: get head of state for given country code
 //Used for the extra function of showing an error if the user tries to add a head for a country that already has one (_id already taken)
 //Case sensitive, but only upper case IDs should be entered into the db anyway
 var getHeadOfState = function (country) {
